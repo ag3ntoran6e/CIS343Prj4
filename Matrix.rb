@@ -1,7 +1,7 @@
 #
 #  Class that represents a Matrix and implements operations on matrices.
 #
-#  Author(s): Your Name(s)
+#  Author(s): Morrie Cunningham & Devin Brown
 #
 class Matrix
 
@@ -13,14 +13,28 @@ class Matrix
 
   # make setter methods for @rows and @columns private
   private :rows=, :columns=
-  
+
   # method that initializes a newly allocated Matrix object
   # use instance variable named @data (an array) to hold matrix elements
   # raise ArgumentError exception if any of the following is true:
   #     parameters rows or columns or val is not of type Fixnum
   #     value of rows or columns is <= 0
   def initialize(rows=5, columns=5, val=0)
+    result = Matrix.new
+    Matrix.rows = rows
+    Matrix.columns = columns
+    unless rows.kind_of? Fixnum) || (columns.kind_of? Fixnum) || (val.kind_of? Fixnum)
+      raise ArgumentError.new("Please enter a number.")
+    end
+    unless (rows <= 0) || (columns <= 0)
+      raise ArguementError.new("Please enter a valid Matrix size.")
+    end
 
+    for r in 0..rows
+      for c in 0..columns
+        Matrix. = val
+      end
+    end
   end
 
   # method that returns matrix element at location (i,j)
@@ -126,7 +140,7 @@ class Matrix
   def each
 
   end
-  
+
 end
 
 #
@@ -237,4 +251,4 @@ def main
 end
 
 # uncomment the following line to run the main() method
-# main()
+ main()
