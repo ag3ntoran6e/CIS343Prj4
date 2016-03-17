@@ -68,10 +68,10 @@ class Matrix
   # raise IncompatibleMatricesError exception if the matrices are not compatible for addition operation
   def add(m)
 
-    # check validitiy
     if (m.class != self.class)
       raise ArgumentError.new("Parameter must be a matrix")
     end
+
     if (m.rows != @rows || m.columns != @columns)
       raise IncompatibleMatricesError.new("Matricies must be same dimensions")
     end
@@ -91,8 +91,6 @@ class Matrix
   # raise ArgumentError exception if the parameter m is not of type Matrix
   # raise IncompatibleMatricesError exception if the matrices are not compatible for subtraction operation
   def subtract(m)
-
-    # check validitiy
     if (m.class != self.class)
       raise ArgumentError.new("Parameter must be a matrix")
     end
@@ -114,19 +112,61 @@ class Matrix
   # method that returns a new matrix object that is a scalar multiple of source matrix object
   # raise ArgumentError exception if the parameter k is not of type Fixnum
   def scalarmult(k)
+    # TODO: error checking
+    newMatrix = Matrix.new(@rows,@columns,0)
 
+    for r in 0..@rows
+      for c in 0..@columns
+        newMatrix.set(r,c, self.get(r,c) * k)
+      end
+    end
+
+    return newMatrix
   end
 
   # method that returns a new matrix object that is the product of this and parameter matrices
   # raise ArgumentError exception if the parameter m is not of type Matrix
   # raise IncompatibleMatricesError exception if the matrices are not compatible for multiplication operation
   def multiply(m)
+    if (m.class != self.class)
+      raise ArgumentError.new("Parameter must be a matrix")
+    end
+    if(@columns != m.rows)
+      raise IncompatibleMatricesError.new("Incompatible matricies")
+    end
 
+    m3 = Matrix.new(@rows,@columns,0)
+
+    for r1 in 0..@rows
+      for c2 in 0..m.columns
+        for c1 in 0..@columns
+          result = m3.get(r1,c2)
+          result += (self.get(r1,c1) * m.get(c1,c2))
+          m3.set(r1,c2,result)
+        end
+      end
+    end
+
+  	return m3;
   end
 
   # method that returns a new matrix object that is the transpose of the source matrix
   def transpose
+    # Matrix *result = create(m->columns, m->rows);
+    # for(int i = 0; i < m->columns; i++) {
+    #   for(int j = 0; j < m->rows; j++) {
+    #     setValueAt(result,i,j,getValueAt(m,j,i));
+    #   }
+    # }
+  	# return result;
 
+    m = Matrix.new(@columns,@rows,0)
+    for c in 0..@columns
+      for r in 0..@rows
+        m.set(r,c, self.get(c,r))
+      end
+    end
+    return m
   end
 
   # overload + for matrix addition
@@ -161,7 +201,13 @@ class Matrix
 
   # method that return a deep copy/clone of this matrix object
   def clone
-
+    m = Matrix.new(@rows,@columns,0)
+    for r in 0..@rows
+      for c in 0..@columns
+        m.set(r,c, self.get(r,c))
+      end
+    end
+    return m
   end
 
   # method that returns true if this matrix object and the parameter matrix object are equal
@@ -170,6 +216,19 @@ class Matrix
   # returns false if the parameter m is not of type Matrix
   def ==(m)
 
+    if(@rows != m.rows || @columns != m.columns)
+      return false
+    end
+
+    for r in 0..@rows
+      for c in 0..@columns
+        if self.get(r,c) != m.get(r,c)
+          return false
+        end
+      end
+    end
+
+    return true
   end
 
   # method that returns a string representation of matrix data in table (row x col) format
@@ -207,39 +266,44 @@ def main
   m3 = Matrix.new(4,5,30)
   m4 = Matrix.new(3,5,40)
 
-  puts "-----m1-----"
+  puts "----- m1 -----"
   puts(m1)
-  puts "-----m2-----"
+  puts "----- m2 -----"
   puts(m2)
-  puts "-----m3-----"
+  puts "----- m3 -----"
   puts(m3)
-  puts "-----m4-----"
+  puts "----- m4 -----"
   puts(m4)
-  puts "-----m1.add(m2)-----"
+  puts "----- m1.add(m2) -----"
   puts(m1.add(m2))
-  puts "-----m1.subtract(m2)-----"
+  puts "----- m1.subtract(m2) -----"
   puts(m1.subtract(m2))
-  puts "-----m1.multiply(m3)-----"
+  puts "----- m1.multiply(m3) -----"
   puts(m1.multiply(m3))
-  puts "-----m2.scalarmult(5)-----"
+  puts "----- m2.scalarmult(5) -----"
   puts(m2.scalarmult(5))
-  puts "-----Matrix.identity(5)-----"
+  puts "----- Matrix.identity(5) -----"
   puts(Matrix.identity(5))
 
-  puts "-----"
-
+  puts "----- m1 + m2 -----"
   puts(m1 + m2)
 
+  puts "----- m2 - m1 -----"
   puts(m2 - m1)
 
+  puts "----- m1 * m3 -----"
   puts(m1 * m3)
 
+  puts "----- m1 + m2 - m1 -----"
   puts(m1 + m2 - m1)
 
-  puts(m4 + m2 * m3)
+  # puts "----- m4 + m2 * m3 -----"
+  # puts(m4 + m2 * m3)
 
+  puts "----- m1.clone() -----"
   puts(m1.clone())
 
+  puts "----- m1.transpose() -----"
   puts(m1.transpose())
 
   puts("Are matrices equal? #{m1 == m2}")
