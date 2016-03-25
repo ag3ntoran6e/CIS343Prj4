@@ -1,8 +1,12 @@
+# encoding: UTF-8
 #
 #  Class that represents a Matrix and implements operations on matrices.
 #
 #  Author(s): Morrie Cunningham & Devin Brown
 #
+
+include Enumerable
+
 class Matrix
 
   # create getter methods for instance variables @rows and @columns
@@ -26,16 +30,16 @@ class Matrix
     @val = val
     @data = []
 
-    if (!@rows.kind_of? Fixnum) || (!@columns.kind_of? Fixnum) || (!@val.kind_of? Fixnum)
+    unless (@rows.kind_of? Fixnum) && (@columns.kind_of? Fixnum) && (@val.kind_of? Fixnum)
       raise ArgumentError.new("Please enter a number.")
     end
 
-    if (rows < 1) || (columns < 1)
-      raise ArguementError.new("Please enter a valid Matrix size.")
+    unless (rows > 0) && (columns > 0)
+      raise ArgumentError.new("Please enter a valid Matrix size.")
     end
 
-    for r in 0..rows
-      for c in 0..columns
+    for r in 0...rows
+      for c in 0...columns
         @data.push val
       end
     end
@@ -47,7 +51,14 @@ class Matrix
   #     parameters i or j is not of type Fixnum
   #     value of i or j is outside the bounds of Matrix
   def get(i, j)
-    # TODO: error checking
+
+    unless (i.kind_of? Fixnum) && (j.kind_of? Fixnum)
+      raise ArgumentError.new("Please enter a number.")
+    end
+
+    unless (i.between?(0,@rows-1)) && (j.between?(0,@columns-1))
+      raise ArgumentError.new("Please enter a valid Matrix size.")
+    end
 
     return @data[i*@columns+j]
   end
@@ -58,7 +69,14 @@ class Matrix
   #     parameters i or j or val is not of type Fixnum
   #     the value of i or j is outside the bounds of Matrix
   def set(i, j, val)
-    # TODO: error checking
+
+    unless (i.kind_of? Fixnum) && (j.kind_of? Fixnum)
+      raise ArgumentError.new("Please enter a number.")
+    end
+
+    unless (i.between?(0,@rows-1)) && (j.between?(0,@columns-1))
+      raise ArgumentError.new("Please enter a valid Matrix size.")
+    end
 
     @data[i*@columns + j] = val
   end
@@ -68,18 +86,18 @@ class Matrix
   # raise IncompatibleMatricesError exception if the matrices are not compatible for addition operation
   def add(m)
 
-    if (m.class != self.class)
+    unless m.instance_of? Matrix
       raise ArgumentError.new("Parameter must be a matrix")
     end
 
-    if (m.rows != @rows || m.columns != @columns)
+    unless (m.rows == @rows) && (m.columns == @columns)
       raise IncompatibleMatricesError.new("Matricies must be same dimensions")
     end
 
     newMatrix = Matrix.new(@rows,@columns,0)
 
-    for r in 0..@rows
-      for c in 0..@columns
+    for r in 0...@rows
+      for c in 0...@columns
         newMatrix.set(r,c, self.get(r,c) + (m.get(r,c)))
       end
     end
@@ -91,17 +109,19 @@ class Matrix
   # raise ArgumentError exception if the parameter m is not of type Matrix
   # raise IncompatibleMatricesError exception if the matrices are not compatible for subtraction operation
   def subtract(m)
-    if (m.class != self.class)
+
+    unless m.instance_of? Matrix
       raise ArgumentError.new("Parameter must be a matrix")
     end
-    if (m.rows != @rows || m.columns != @columns)
+
+    unless (m.rows == @rows) && (m.columns == @columns)
       raise IncompatibleMatricesError.new("Matricies must be same dimensions")
     end
 
     newMatrix = Matrix.new(@rows,@columns,0)
 
-    for r in 0..@rows
-      for c in 0..@columns
+    for r in 0...@rows
+      for c in 0...@columns
         newMatrix.set(r,c, self.get(r,c) - (m.get(r,c)))
       end
     end
@@ -112,11 +132,15 @@ class Matrix
   # method that returns a new matrix object that is a scalar multiple of source matrix object
   # raise ArgumentError exception if the parameter k is not of type Fixnum
   def scalarmult(k)
-    # TODO: error checking
+
+    unless k.kind_of? Fixnum
+      raise ArgumentError.new("Please enter a number.")
+    end
+
     newMatrix = Matrix.new(@rows,@columns,0)
 
-    for r in 0..@rows
-      for c in 0..@columns
+    for r in 0...@rows
+      for c in 0...@columns
         newMatrix.set(r,c, self.get(r,c) * k)
       end
     end
@@ -128,18 +152,20 @@ class Matrix
   # raise ArgumentError exception if the parameter m is not of type Matrix
   # raise IncompatibleMatricesError exception if the matrices are not compatible for multiplication operation
   def multiply(m)
-    if (m.class != self.class)
+
+    unless m.instance_of? Matrix
       raise ArgumentError.new("Parameter must be a matrix")
     end
-    if(@columns != m.rows)
+
+    unless @columns == m.rows
       raise IncompatibleMatricesError.new("Incompatible matricies")
     end
 
-    m3 = Matrix.new(@rows,@columns,0)
+    m3 = Matrix.new(@rows,m.columns,0)
 
-    for r1 in 0..@rows
-      for c2 in 0..m.columns
-        for c1 in 0..@columns
+    for r1 in 0...@rows
+      for c2 in 0...m.columns
+        for c1 in 0...@columns
           result = m3.get(r1,c2)
           result += (self.get(r1,c1) * m.get(c1,c2))
           m3.set(r1,c2,result)
@@ -161,9 +187,9 @@ class Matrix
   	# return result;
 
     m = Matrix.new(@columns,@rows,0)
-    for c in 0..@columns
-      for r in 0..@rows
-        m.set(r,c, self.get(c,r))
+    for c in 0...@columns
+      for r in 0...@rows
+        m.set(c,r, self.get(r,c))
       end
     end
     return m
@@ -190,20 +216,39 @@ class Matrix
   #     the value of size <= 0
   def Matrix.identity(size)
 
+    unless size.kind_of? Fixnum
+      raise ArgumentError.new("Please enter a number.")
+    end
+    unless size > 0
+      raise ArgumentError.new("Please enter a valid number.")
+    end
+
+    m = Matrix.new(size,size,0)
+    for r in 0...size
+      for c in 0...size
+        if r == c
+          m.set(r,c,1)
+        end
+      end
+    end
+    m
   end
 
   # method that sets every element in the matrix to value of parameter val
   # raise ArgumentError exception if val is not of type Fixnum
   # hint: use fill() method of Array to fill the matrix
   def fill(val)
-
+    unless val.kind_of? Fixnum
+      raise ArgumentError.new("Please enter a number.")
+    end
+    @data.fill(val)
   end
 
   # method that return a deep copy/clone of this matrix object
   def clone
     m = Matrix.new(@rows,@columns,0)
-    for r in 0..@rows
-      for c in 0..@columns
+    for r in 0...@rows
+      for c in 0...@columns
         m.set(r,c, self.get(r,c))
       end
     end
@@ -216,12 +261,12 @@ class Matrix
   # returns false if the parameter m is not of type Matrix
   def ==(m)
 
-    if(@rows != m.rows || @columns != m.columns)
+    unless (m.instance_of? Matrix) && (@rows == m.rows) && (@columns == m.columns)
       return false
     end
 
-    for r in 0..@rows
-      for c in 0..@columns
+    for r in 0...@rows
+      for c in 0...@columns
         if self.get(r,c) != m.get(r,c)
           return false
         end
@@ -234,8 +279,12 @@ class Matrix
   # method that returns a string representation of matrix data in table (row x col) format
   def to_s
     string = ""
-    for r in 0..@rows
-      string += "#{@data[r..r+@columns]}\n"
+    for r in 0...@rows
+      for c in 0...@columns
+        string += "#{self.get(r,c)} "
+      end
+      string = string[0..-2] # remove trailing space
+      string += "\n"
     end
     return string
   end
@@ -243,7 +292,11 @@ class Matrix
   # method that for each element in the matrix yields with information
   # on row, column, and data value at location (i,j)
   def each
-
+    for r in 0...@rows
+      for c in 0...@columns
+        yield r, c, self.get(r,c)
+      end
+    end
   end
 
 end
