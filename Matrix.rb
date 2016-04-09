@@ -27,7 +27,6 @@ class Matrix
 
     @rows = rows
     @columns = columns
-    @val = val
     @data = []
 
     unless (@rows.kind_of? Fixnum) && (@columns.kind_of? Fixnum) && (@val.kind_of? Fixnum)
@@ -178,13 +177,6 @@ class Matrix
 
   # method that returns a new matrix object that is the transpose of the source matrix
   def transpose
-    # Matrix *result = create(m->columns, m->rows);
-    # for(int i = 0; i < m->columns; i++) {
-    #   for(int j = 0; j < m->rows; j++) {
-    #     setValueAt(result,i,j,getValueAt(m,j,i));
-    #   }
-    # }
-  	# return result;
 
     m = Matrix.new(@columns,@rows,0)
     for c in 0...@columns
@@ -319,44 +311,33 @@ def main
   m3 = Matrix.new(4,5,30)
   m4 = Matrix.new(3,5,40)
 
-  puts "----- m1 -----"
   puts(m1)
-  puts "----- m2 -----"
   puts(m2)
-  puts "----- m3 -----"
   puts(m3)
-  puts "----- m4 -----"
   puts(m4)
-  puts "----- m1.add(m2) -----"
+
   puts(m1.add(m2))
-  puts "----- m1.subtract(m2) -----"
+
   puts(m1.subtract(m2))
-  puts "----- m1.multiply(m3) -----"
+
   puts(m1.multiply(m3))
-  puts "----- m2.scalarmult(5) -----"
+
   puts(m2.scalarmult(5))
-  puts "----- Matrix.identity(5) -----"
+
   puts(Matrix.identity(5))
 
-  puts "----- m1 + m2 -----"
   puts(m1 + m2)
 
-  puts "----- m2 - m1 -----"
   puts(m2 - m1)
 
-  puts "----- m1 * m3 -----"
   puts(m1 * m3)
 
-  puts "----- m1 + m2 - m1 -----"
   puts(m1 + m2 - m1)
 
-  # puts "----- m4 + m2 * m3 -----"
-  # puts(m4 + m2 * m3)
+  puts(m4 + m2 * m3)
 
-  puts "----- m1.clone() -----"
   puts(m1.clone())
 
-  puts "----- m1.transpose() -----"
   puts(m1.transpose())
 
   puts("Are matrices equal? #{m1 == m2}")
@@ -420,4 +401,4 @@ def main
 end
 
 # uncomment the following line to run the main() method
- main()
+# main()
